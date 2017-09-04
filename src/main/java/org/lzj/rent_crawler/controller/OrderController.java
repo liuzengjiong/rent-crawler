@@ -51,7 +51,8 @@ public class OrderController {
 				request.getScheme() +"://" + request.getServerName()  + ":" +request.getServerPort() +request.getContextPath();
 
 		
-		List<InterestPoint> points = service.getInterestPoints();
+		List<InterestPoint> points = service.getInterestPointsByMail(mail);
+		
 		map.put("mail", mail);
 		map.put("points", points);
 		map.put("stationListStr",subwayInfo.getAllStationName().toString());

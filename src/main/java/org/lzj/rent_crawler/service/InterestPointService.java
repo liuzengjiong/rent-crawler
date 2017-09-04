@@ -36,6 +36,25 @@ public class InterestPointService {
 		
 	}
 	
+	public List<InterestPoint> getInterestPointsByMail(String mail){
+		
+		try {
+			List<InterestPoint> list = pointDao.readInterestPoint(Constant.interest_point_file);
+			List<InterestPoint> result = new ArrayList<>();
+			
+			for(InterestPoint point : list){
+				if(mail.equals(point.getMail())){
+					result.add(point);
+				}
+			}
+			return result;
+		} catch (IOException e) {
+			logger.error("获取兴趣点发生错误{}",e.getMessage());
+			return new ArrayList<>();
+		}
+		
+	}
+	
 	public boolean addPoint(InterestPoint point){
 		try {
 			pointDao.addPoint(Constant.interest_point_file, point);
