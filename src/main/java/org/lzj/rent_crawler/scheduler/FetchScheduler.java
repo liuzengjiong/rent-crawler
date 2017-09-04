@@ -24,7 +24,7 @@ import org.lzj.rent_crawler.content.HouseAnalysis;
 import org.lzj.rent_crawler.content.SubwayInfoHolder;
 import org.lzj.rent_crawler.model.House;
 import org.lzj.rent_crawler.model.InterestPoint;
-import org.lzj.rent_crawler.model.InterestPointHolder;
+import org.lzj.rent_crawler.service.InterestPointService;
 import org.lzj.rent_crawler.util.MailUtil;
 import org.lzj.rent_crawler.util.UrlBuilder;
 import org.slf4j.Logger;
@@ -51,8 +51,11 @@ public class FetchScheduler {
 	@Autowired
 	private SubwayInfoHolder subwayInfoHolder;
 	
+//	@Autowired
+//	private InterestPointHolder pointHolder;
+	
 	@Autowired
-	private InterestPointHolder pointHolder;
+	private InterestPointService pointService;
 	
 	@Autowired
 	private HouseAnalysis houseAnalysis;
@@ -60,27 +63,15 @@ public class FetchScheduler {
 	@Autowired
 	private MailUtil mailUtil;
 	
-	private static final int max_num_once_send = 20;
+//	private static final int max_num_once_send = 20;
 	
-	//6个钟执行一次
-	@Scheduled(fixedRate=1000 * 60 * 60 * 6,initialDelay = 5000) 
+//	private final long gapTime = 1000 * 60 * 60 *6;
+	
+	//6：00  ； 12：00 ；18：00
+	@Scheduled(cron = "0 0 0/6 * * ?")
 	public void schedule(){
 		
-		InterestPoint testPoint = new InterestPoint();
-		testPoint.setStationName("园岭站");
-		testPoint.setRoomType("1室");
-		testPoint.setPriceTo(2500);
-		testPoint.setMail("liuzengjiong@qq.com");
-		pointHolder.addPoint(testPoint);
-		
-		InterestPoint testPoint2 = new InterestPoint();
-		testPoint2.setStationName("太安站");
-		testPoint2.setRoomType("1室");
-		testPoint2.setPriceTo(2500);
-		testPoint2.setMail("liuzengjiong@qq.com");
-		pointHolder.addPoint(testPoint2);
-		
-		Collection<InterestPoint> points = pointHolder.getAllPoint();
+		Collection<InterestPoint> points = pointService.getInterestPoints();
 		Map<String,List<InterestPoint>> subwayStationPoints = new HashMap<>();
 		
 		Iterator<InterestPoint> ite = points.iterator();

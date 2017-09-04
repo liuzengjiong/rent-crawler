@@ -13,4 +13,6 @@ public class Constant {
 	
 	public static final String have_send_suffix = "_haveSend.txt"; //mail_haveSend
 	
+	public static final String interest_point_file = "interestPoints.txt";
+	
 }

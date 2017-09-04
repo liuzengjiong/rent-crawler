@@ -17,51 +17,56 @@ import org.springframework.util.StringUtils;
 @Component
 public class InterestPointHolder {
 	
-	private Map<String,List<InterestPoint>> pointMap = new HashMap<>();
 	
-	public boolean addPoint(InterestPoint point){
-		if(StringUtils.isEmpty(point.getMail())){
-			return false;
-		}
-		List<InterestPoint> points = pointMap.get(point.getMail());
-		if(points == null){
-			points = new ArrayList<InterestPoint>();
-			pointMap.put(point.getMail(), points);
-		}
-		if(existPoint(points, point)){
-			return false;
-		}
-		points.add(point);
-		return true;
-	}
+//	public List<InterestPoint> getAllPoints(){
+//		
+//	}
 	
-	private boolean existPoint(List<InterestPoint> points,InterestPoint point){
-		for(InterestPoint existPoint : points){
-			if(existPoint.getStationName()!=null && existPoint.getStationName().equals(point.getStationName())){
-				return true;
-			}
-		}
-		return false;
-	}
+//	private Map<String,List<InterestPoint>> pointMap = new HashMap<>();
 	
-	public boolean removePoint(String mail){
-		pointMap.remove(mail);
-		return true;
-	}
-	
-	public Collection<InterestPoint> getAllPoint(){
-		List<InterestPoint> allPoints = new ArrayList<InterestPoint>();
-		for(String mail : pointMap.keySet()){
-			allPoints.addAll(pointMap.get(mail));
-		}
-		return allPoints;
-	}
-	
-	public Map<String,List<InterestPoint>> getPointMap() {
-		return pointMap;
-	}
-
-	public void setPointMap(Map<String,List<InterestPoint>> pointMap) {
-		this.pointMap = pointMap;
-	}
+//	public boolean addPoint(InterestPoint point){
+//		if(StringUtils.isEmpty(point.getMail())){
+//			return false;
+//		}
+//		List<InterestPoint> points = pointMap.get(point.getMail());
+//		if(points == null){
+//			points = new ArrayList<InterestPoint>();
+//			pointMap.put(point.getMail(), points);
+//		}
+//		if(existPoint(points, point)){
+//			return false;
+//		}
+//		points.add(point);
+//		return true;
+//	}
+//	
+//	private boolean existPoint(List<InterestPoint> points,InterestPoint point){
+//		for(InterestPoint existPoint : points){
+//			if(existPoint.getStationName()!=null && existPoint.getStationName().equals(point.getStationName())){
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+//	
+//	public boolean removePoint(String mail){
+//		pointMap.remove(mail);
+//		return true;
+//	}
+//	
+//	public Collection<InterestPoint> getAllPoint(){
+//		List<InterestPoint> allPoints = new ArrayList<InterestPoint>();
+//		for(String mail : pointMap.keySet()){
+//			allPoints.addAll(pointMap.get(mail));
+//		}
+//		return allPoints;
+//	}
+//	
+//	public Map<String,List<InterestPoint>> getPointMap() {
+//		return pointMap;
+//	}
+//
+//	public void setPointMap(Map<String,List<InterestPoint>> pointMap) {
+//		this.pointMap = pointMap;
+//	}
 }
