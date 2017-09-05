@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.lzj.rent_crawler.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,21 @@ public class UrlLoadUtil {
 	
 	static Logger logger = LoggerFactory.getLogger(UrlLoadUtil.class);
 	
+	private static String lastDomain = "";
+	
 	public static String get(String url){
+		
+		if(UrlBuilder.getDomain(url).equals(lastDomain)){
+			try {
+				int seconds = Constant.threadLoadNum == 0?1:Constant.threadLoadNum;
+				logger.info("域名{}相同，休眠{}秒",lastDomain,seconds);
+				Thread.sleep(seconds);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		lastDomain = UrlBuilder.getDomain(url);
 		
 		StringBuilder result = new StringBuilder();
 		

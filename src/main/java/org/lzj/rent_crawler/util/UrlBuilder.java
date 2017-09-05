@@ -28,6 +28,11 @@ public class UrlBuilder {
 		return url.toString();
 	}
 	
+	public static String getDomain(String url){
+		String regex = "(\\S*?.com)";
+		return RegexUtil.getOneParam(url, regex);
+	}
+	
 	public static String getNextHousePage(String url){
 		
 		String regex = "pn(\\d*)";

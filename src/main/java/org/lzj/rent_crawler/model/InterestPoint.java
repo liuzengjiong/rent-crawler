@@ -22,6 +22,8 @@ public class InterestPoint {
 	private int priceFrom;
 	
 	private int priceTo;
+	
+	private boolean nearlyUpdate;
 
 	public String getStationName() {
 		return stationName;
@@ -77,7 +79,8 @@ public class InterestPoint {
 				&& compareString(this.stationName,point.getStationName())
 				&& compareString(this.roomType,point.getRoomType())
 				&& this.priceFrom == point.getPriceFrom()
-				&& this.priceTo == point.getPriceTo();
+				&& this.priceTo == point.getPriceTo()
+				&& !(this.nearlyUpdate ^ point.isNearlyUpdate());
 		
 	}
 	
@@ -93,6 +96,14 @@ public class InterestPoint {
 			return true;
 		}
 		return false;
+	}
+
+	public boolean isNearlyUpdate() {
+		return nearlyUpdate;
+	}
+
+	public void setNearlyUpdate(boolean nearlyUpdate) {
+		this.nearlyUpdate = nearlyUpdate;
 	}
 	
 }

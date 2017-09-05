@@ -4,7 +4,7 @@
 </head>
 <body> 
  <br />
-  
+  ${mail},你好 <br />	<br />	
   <#if points?size != 0>
   		已订阅列表: <br />
 	   <ul id="parent">
@@ -13,11 +13,12 @@
 			<li class="houseBlock">
 				【${point_index+1}】  地铁：${point.stationName!"没有要求"}</h3> <br />
 				房间类型：${point.roomType!"没有要求"}  <br />
+				只看最近更新 ：${point.nearlyUpdate?string ("是","否")}
 				<#if point.priceFrom != 0 || point.priceTo != 0 >
-				价格区间：${point.priceFrom} - ${point.priceTo} <br />
+				 <br />  价格区间：${point.priceFrom} - ${point.priceTo}
 				</#if>
-				<hr/>
 				&nbsp;&nbsp;<a href="${deleteUrl}/${mail}/${point.id}">取消订阅</a><br/>
+				<hr/>
 			</li>
 			
 		</#list>
@@ -25,12 +26,13 @@
   </#if> 
   <br />
   <br />
-       新 增订阅：<br />
+       新增订阅：<br />
   <form action="${addUrl}" >
   	<input type="hidden" name="mail" value="${mail}" />
   	地铁：<input type="text" name="stationName" /> * <br />
   	户型：<input type="text" name="roomType" /> <br />
   	价格：<input type="text" name="priceFrom" />  -  <input type="text" name="priceTo" />　<br />
+  	只看最近更新：<input type="radio" name="nearlyUpdate" value="true" />是 &nbsp;&nbsp;<input type="radio" name="nearlyUpdate" value="false" checked />否
   	<input type="submit" value="提交" />
   </form>
   

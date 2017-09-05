@@ -63,7 +63,7 @@ public class OrderController {
 	}
 	
 	@RequestMapping("/add")
-	public String add(String mail,String roomType,Integer priceFrom,Integer priceTo,String stationName,
+	public String add(String mail,String roomType,Integer priceFrom,Integer priceTo,String stationName,Boolean nearlyUpdate,
 			HttpServletRequest request,HashMap<String,Object> map){
 		
 		if(StringUtils.isEmpty(mail)){
@@ -76,6 +76,7 @@ public class OrderController {
 			return "/error";
 		}
 		
+		
 		InterestPoint point = new InterestPoint();
 		point.setId(UUID.randomUUID().toString());
 		point.setMail(mail);
@@ -87,6 +88,9 @@ public class OrderController {
 		if(priceTo != null){
 			point.setPriceTo(priceTo);
 		}
+		if(nearlyUpdate != null){
+			point.setNearlyUpdate(nearlyUpdate);
+		}
 		List<InterestPoint> list = service.getInterestPoints();
 		for(InterestPoint existPoint : list){
 			if(existPoint.equalsByCondition(point)){
@@ -96,7 +100,7 @@ public class OrderController {
 		}
 		
 		if(service.addPoint(point)){
-			String url = "/order/selectPage?mail="+mail;
+			String url = "redirect:/order/selectPage?mail="+mail;
 			return url;
 		}else{
 			map.put("errorMsg", "添加订阅信息失败！");
@@ -116,7 +120,7 @@ public class OrderController {
 		}
 		
 		if(service.deletePoint(id)){
-			String url = "/order/selectPage?mail="+mail;
+			String url = "redirect:/order/selectPage?mail="+mail;
 			return url;
 		}else{
 			map.put("errorMsg", "该订阅信息不存在");

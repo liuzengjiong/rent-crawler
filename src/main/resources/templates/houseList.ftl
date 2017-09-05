@@ -36,7 +36,7 @@
             border-left: 5px solid#2f2f2f;}
 	
 </style> 
-${mail}，订阅的租房信息更新  <br />
+${mail}，订阅的${stationName!""}租房信息更新  <br />
   
       本次 搜索条件 ： ${searchCondition}  <br />
       本次房子数量：${houseSize} <br />

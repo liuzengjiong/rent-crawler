@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 
 import org.lzj.rent_crawler.Constant;
 import org.lzj.rent_crawler.content.HouseAnalysis;
+import org.lzj.rent_crawler.content.SubwayAnalysis;
 import org.lzj.rent_crawler.content.SubwayInfoHolder;
 import org.lzj.rent_crawler.model.House;
 import org.lzj.rent_crawler.model.InterestPoint;
@@ -61,15 +62,35 @@ public class FetchScheduler {
 	private HouseAnalysis houseAnalysis;
 	
 	@Autowired
+	private SubwayAnalysis subwayAnalysis;
+	
+	@Autowired
 	private MailUtil mailUtil;
+	
+	private boolean haveSendWarning;
+	
+	private String warningReceiver = "liuzengjiong@126.com";
 	
 //	private static final int max_num_once_send = 20;
 	
 //	private final long gapTime = 1000 * 60 * 60 *6;
 	
 	//6：00  ； 12：00 ；18：00
-	@Scheduled(cron = "0 0 0/6 * * ?")
+//	@Scheduled(cron = "0 0 0/6 * * ?")
+	@Scheduled(fixedRate=1000 * 120 * 10)
 	public void schedule(){
+		
+		int count = 0;
+		subwayAnalysis.intiSubwayToHolder();
+		while(subwayInfoHolder.getAllStationName().size() == 0 && count++ < 5){
+			long seconds = 20;
+			logger.info("地铁数量为0，尝试休眠{}秒再获取",seconds);
+			try {
+				Thread.sleep(1000 * seconds);
+			} catch (InterruptedException e) {
+			}
+			subwayAnalysis.intiSubwayToHolder();
+		}
 		
 		Collection<InterestPoint> points = pointService.getInterestPoints();
 		Map<String,List<InterestPoint>> subwayStationPoints = new HashMap<>();
@@ -89,6 +110,8 @@ public class FetchScheduler {
 		
 		ExecutorService exes = Executors.newCachedThreadPool();
 		logger.info("查询的地铁站点size{}",subwayStationPoints.size());
+		Constant.threadLoadNum = subwayStationPoints.size();
+		haveSendWarning = false;
 		for(String stationName : subwayStationPoints.keySet()){
 			List<InterestPoint> pointsOfStation = subwayStationPoints.get(stationName);
 			exes.execute(new FetchThread(stationName, pointsOfStation));
@@ -111,6 +134,11 @@ public class FetchScheduler {
 		
 		@Override
 		public void run() {
+			
+			long currentMill = System.currentTimeMillis();
+			
+			int sumSend = 0;
+			
 			logger.info("启动线程，地铁：{}，points：{}，size：{}",stationName,JSONObject.toJSONString(points),points.size());
 			
 			String stationUrl = subwayInfoHolder.getStationUrl(stationName);
@@ -119,8 +147,10 @@ public class FetchScheduler {
 			}
 			
 			houseWaitSend = calculateToWaitSend(stationUrl);
+			
 			for(InterestPoint point : points){
 				List<House> toSend = selectToSend(houseWaitSend, point);
+				sumSend += toSend.size();
 				logger.info("发送{}条记录给{}",toSend.size(),point.getMail());
 				try {
 					if(toSend.size() > 0){
@@ -134,6 +164,13 @@ public class FetchScheduler {
 					appendToHaveSendFile(point.getMail()+Constant.have_send_suffix, toSend);
 				} catch (IOException e) {
 					logger.error("记录已发送历史失败{},",e.getMessage());
+				}
+			}
+			
+			//10秒中就爬好，判定为被要求验证码
+			if(sumSend == 0 && System.currentTimeMillis() - currentMill  < 1000 * 10 && !haveSendWarning){
+				if(mailUtil.sendNormalMail(warningReceiver, "租房邮件警告", "系统可能被要求验证码")){
+					haveSendWarning = true;
 				}
 			}
 		}
@@ -182,6 +219,10 @@ public class FetchScheduler {
 				int housePrice = house.getPrice() == null? 0 : Integer.valueOf(house.getPrice());
 				if((point.getPriceTo()!=0 || point.getPriceFrom()!= 0) &&
 						(point.getPriceTo()<housePrice || point.getPriceFrom()> housePrice )){
+					continue;
+				}
+				if(point.isNearlyUpdate() && (house.getSendTime() == null || !house.getSendTime().contains("前"))){
+					
 					continue;
 				}
 				if(!haveSendUrl.add(house.getUrl())){
