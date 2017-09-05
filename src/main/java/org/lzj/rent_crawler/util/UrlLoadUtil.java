@@ -29,7 +29,7 @@ public class UrlLoadUtil {
 		if(UrlBuilder.getDomain(url).equals(lastDomain)){
 			try {
 				int seconds = Constant.threadLoadNum == 0?1:Constant.threadLoadNum;
-				logger.info("域名{}相同，休眠{}秒",lastDomain,seconds);
+//				logger.info("域名{}相同，休眠{}秒",lastDomain,seconds);
 				Thread.sleep(seconds);
 			} catch (InterruptedException e) {
 				e.printStackTrace();

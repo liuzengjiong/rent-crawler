@@ -1,6 +1,5 @@
 package org.lzj.rent_crawler.util;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,19 +11,18 @@ import javax.mail.internet.MimeMessage;
 
 import org.lzj.rent_crawler.model.House;
 import org.lzj.rent_crawler.model.InterestPoint;
+import org.lzj.rent_crawler.model.MailContent;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.StringUtils;
 
-import ch.qos.logback.classic.Logger;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 /**
  * @TODO 
@@ -46,10 +44,18 @@ public class MailUtil {
 	 @Value("${spring.mail.username:liuzengjiong@126.com}")
 	 private String username;
 	 
+	 private static org.slf4j.Logger logger = LoggerFactory.getLogger(MailUtil.class);
 	 
-	 public boolean sendHouseList(InterestPoint point,List<House> houseList) throws IOException, TemplateException{
+	 
+	 public boolean sendHouseList(MailContent mailContent){
 		 
+		 InterestPoint point = mailContent.getPoint();
 		 
+		 List<House> houseList = mailContent.getHouseList();
+		 
+		 if(point == null || houseList == null || houseList.size() == 0){
+			 return false;
+		 }
 		 
 		 String subject = "租房邮件提醒";
 		 
@@ -74,12 +80,12 @@ public class MailUtil {
          model.put("houseSize", houseList.size());
          model.put("houseList", houseList);
 		 
-         Template t = configuration.getTemplate("houseList.ftl"); // freeMarker template  
-         String content = FreeMarkerTemplateUtils.processTemplateIntoString(t, model); 
-         
 		 try  
 	        {  
-	            
+			 
+			 	Template t = configuration.getTemplate("houseList.ftl"); // freeMarker template  
+			 	String content = FreeMarkerTemplateUtils.processTemplateIntoString(t, model); 
+	     
 	            final MimeMessage mimeMessage = this.mailSender.createMimeMessage();  
 	            final MimeMessageHelper message = new MimeMessageHelper(mimeMessage,true);  
 	            message.setFrom(username);  
@@ -93,11 +99,12 @@ public class MailUtil {
 	              
 	        }  
 	        catch(Exception ex){  
-	        	ex.printStackTrace();
+	        	logger.error("发送房子列表邮件失败{}"+ex.getMessage());
 	            return false;  
 	        }  
 		 
 	 }
+	 
 	 
 	 public boolean sendNormalMail(String toMail,String title,String content){
 		 
@@ -112,6 +119,7 @@ public class MailUtil {
 			mailSender.send(mimeMessage);  
 			return true;
 		} catch (MessagingException e) {
+			logger.error("发送邮件失败{}",e.getMessage());
 			return false;
 		}  
 	 }

@@ -16,6 +16,7 @@ import org.lzj.rent_crawler.content.HouseAnalysis;
 import org.lzj.rent_crawler.content.SubwayInfoHolder;
 import org.lzj.rent_crawler.model.House;
 import org.lzj.rent_crawler.model.InterestPoint;
+import org.lzj.rent_crawler.model.MailContent;
 import org.lzj.rent_crawler.util.MailUtil;
 import org.lzj.rent_crawler.util.RegexUtil;
 import org.lzj.rent_crawler.util.UrlBuilder;
@@ -111,12 +112,7 @@ public class MyTest {
 			list.add(house);
 		}
 		
-		try {
-			mailUtil.sendHouseList(testPoint, list);
-		} catch (IOException | TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		mailUtil.sendHouseList(new MailContent(testPoint, list));
 		
 	}
 	

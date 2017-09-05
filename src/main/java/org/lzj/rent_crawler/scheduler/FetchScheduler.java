@@ -25,6 +25,7 @@ import org.lzj.rent_crawler.content.SubwayAnalysis;
 import org.lzj.rent_crawler.content.SubwayInfoHolder;
 import org.lzj.rent_crawler.model.House;
 import org.lzj.rent_crawler.model.InterestPoint;
+import org.lzj.rent_crawler.model.MailContent;
 import org.lzj.rent_crawler.service.InterestPointService;
 import org.lzj.rent_crawler.util.MailUtil;
 import org.lzj.rent_crawler.util.UrlBuilder;
@@ -76,8 +77,8 @@ public class FetchScheduler {
 //	private final long gapTime = 1000 * 60 * 60 *6;
 	
 	//6：00  ； 12：00 ；18：00
-	@Scheduled(cron = "0 0 0/6 * * ?")
-//	@Scheduled(fixedRate=1000 * 120 * 10)
+//	@Scheduled(cron = "0 0 0/6 * * ?")
+	@Scheduled(fixedRate=1000 * 120 * 10)
 	public void schedule(){
 		
 		int count = 0;
@@ -150,19 +151,10 @@ public class FetchScheduler {
 			for(InterestPoint point : points){
 				List<House> toSend = selectToSend(houseWaitSend, point);
 				sumSend += toSend.size();
-				logger.info("发送{}条记录给{}",toSend.size(),point.getMail());
-				try {
-					if(toSend.size() > 0){
-						mailUtil.sendHouseList(point, toSend);
-					}
-				} catch (IOException | TemplateException e1) {
-					e1.printStackTrace();
-					logger.error("发送邮件失败:{}",e1.getMessage());
-				}
-				try {
-					appendToHaveSendFile(point.getMail()+Constant.have_send_suffix, toSend);
-				} catch (IOException e) {
-					logger.error("记录已发送历史失败{},",e.getMessage());
+				if(toSend.size() > 0){
+					MailHolder.produceMail(new MailContent(point, toSend));
+				}else{
+					logger.info("查询到{}的房子数量为0",point.getStationName());
 				}
 			}
 			
@@ -255,40 +247,7 @@ public class FetchScheduler {
 			return urls;
 		}
 		
-		private void appendToHaveSendFile(String fileName,List<House> houses) throws IOException{
-			
-			File file = new File(fileName);
-			if(!file.exists()){
-				file.createNewFile();
-			}
-			
-			FileInputStream in = new FileInputStream(file);
-			InputStreamReader reader = new InputStreamReader(in);
-			BufferedReader buf = new BufferedReader(reader);
-			StringBuilder sb = new StringBuilder();
-			String s;
-			while((s=buf.readLine()) != null){
-				sb.append(s).append("\n");
-			}
-			buf.close();
-			reader.close();
-			in.close();
-			
-			for(House house : houses){
-				String jsonStr = JSONObject.toJSONString(house);
-				sb.append(jsonStr).append("\n");
-			}
-			
-			FileOutputStream out = new FileOutputStream(file);
-			OutputStreamWriter writer = new OutputStreamWriter(out);
-			BufferedWriter bufWriter = new BufferedWriter(writer);
-			bufWriter.write(sb.toString());
-			bufWriter.flush();
-			bufWriter.close();
-			writer.close();
-			out.close();
-			
-		}
+		
 	}
 	
 }
