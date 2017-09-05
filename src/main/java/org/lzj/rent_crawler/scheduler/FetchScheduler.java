@@ -81,7 +81,6 @@ public class FetchScheduler {
 	public void schedule(){
 		
 		int count = 0;
-		subwayAnalysis.intiSubwayToHolder();
 		while(subwayInfoHolder.getAllStationName().size() == 0 && count++ < 5){
 			long seconds = 20;
 			logger.info("地铁数量为0，尝试休眠{}秒再获取",seconds);
